@@ -351,15 +351,57 @@
   @keyframes confettiBurst{
     0%{ opacity:1; transform:translate(-50%,-50%) translate(0,0) rotate(0deg) scale(.6); }
     100%{ opacity:0; transform:translate(-50%,-50%) translate(var(--tx), var(--ty)) rotate(var(--rot)) scale(1); }
+  }  html.locked, body.locked{
+    overflow:hidden;
+    height:100%;
+    overscroll-behavior:none;
+  }
+
+  #intro .mood{
+    font-size:44px;
+    line-height:1;
+    min-height:52px;
+    transition:transform .25s ease;
+  }
+  #intro .mood.bump{
+    animation:moodBump .4s ease;
+  }
+  @keyframes moodBump{
+    0%,100%{ transform:scale(1); }
+    50%{ transform:scale(1.3) rotate(-6deg); }
+  }
+
+  #away-msg{
+    position:fixed; left:50%; top:18%;
+    transform:translate(-50%,-10px);
+    z-index:1001;
+    font-family:'Caveat', cursive;
+    font-size:clamp(24px,4.5vw,34px);
+    color:var(--wine);
+    background:var(--paper-2);
+    border:1px solid rgba(91,36,52,.2);
+    padding:10px 26px;
+    border-radius:999px;
+    box-shadow:0 14px 30px -14px rgba(91,36,52,.45);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  #away-msg.show{
+    opacity:1;
+    transform:translate(-50%,0);
   }
 </style>
 </head>
 <body>
 
 <div id="intro">
+  <div class="mood" id="intro-mood">&nbsp;</div>
   <button id="press-btn">pencet aku</button>
   <div class="hint" id="press-hint">&nbsp;</div>
 </div>
+
+<div id="away-msg">mau kemana? 👀</div>
 
 <div id="boom-text"><span>🎉 Selamat Ulang Tahun 🎉</span></div>
 
@@ -431,7 +473,13 @@
     const hint = document.getElementById('press-hint');
     const intro = document.getElementById('intro');
     const boomText = document.getElementById('boom-text');
+    const mood = document.getElementById('intro-mood');
+    const awayMsg = document.getElementById('away-msg');
     let clicks = 0;
+    let done = false;
+
+    document.documentElement.classList.add('locked');
+    document.body.classList.add('locked');
 
     const colors = ['#D98FA0','#C9A66B','#5B2434','#B96477','#F2E8DA'];
 
@@ -452,14 +500,61 @@
       }
     }
 
+    // ---- mood makin kesal kalau belum dipencet ----
+    const moodStages = [
+      { emoji:'🙂', text:'&nbsp;' },
+      { emoji:'😐', text:'buruan dong...' },
+      { emoji:'🙁', text:'kok belum dipencet sih' },
+      { emoji:'😠', text:'PENCET WOI' },
+      { emoji:'😡', text:'terakhir nih, pencet!' }
+    ];
+    let stage = 0;
+    const moodTimer = setInterval(()=>{
+      if(done) return clearInterval(moodTimer);
+      stage = Math.min(stage+1, moodStages.length-1);
+      const s = moodStages[stage];
+      mood.textContent = s.emoji;
+      mood.classList.remove('bump');
+      void mood.offsetWidth;
+      mood.classList.add('bump');
+      hint.innerHTML = s.text;
+    }, 4000);
+
+    // ---- 'mau kemana?' kalau coba scroll/geser ----
+    let awayTimeoutId;
+    function flashAway(){
+      if(done) return;
+      awayMsg.classList.add('show');
+      clearTimeout(awayTimeoutId);
+      awayTimeoutId = setTimeout(()=> awayMsg.classList.remove('show'), 1000);
+    }
+    function blockEvent(e){
+      if(done) return;
+      e.preventDefault();
+      flashAway();
+    }
+    window.addEventListener('wheel', blockEvent, {passive:false});
+    window.addEventListener('touchmove', blockEvent, {passive:false});
+    window.addEventListener('keydown', (e)=>{
+      if(done) return;
+      const keys = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','PageUp','PageDown','Home','End',' '];
+      if(keys.includes(e.key)){ e.preventDefault(); flashAway(); }
+    }, {passive:false});
+
     btn.addEventListener('click', ()=>{
       clicks++;
       if(clicks === 1){
+        stage = 0;
         hint.textContent = 'pencet sekali lagi...';
+        mood.textContent = '🥺';
         btn.classList.remove('shake');
         void btn.offsetWidth;
         btn.classList.add('shake');
       } else if(clicks >= 2){
+        done = true;
+        clearInterval(moodTimer);
+        window.removeEventListener('wheel', blockEvent);
+        window.removeEventListener('touchmove', blockEvent);
         btn.disabled = true;
         spawnConfetti();
         boomText.classList.add('pop');
@@ -470,6 +565,8 @@
         setTimeout(()=>{
           boomText.classList.remove('pop');
           intro.remove();
+          document.documentElement.classList.remove('locked');
+          document.body.classList.remove('locked');
         }, 1500);
       }
     });
