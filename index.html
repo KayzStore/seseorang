@@ -391,6 +391,124 @@
     opacity:1;
     transform:translate(-50%,0);
   }
+
+  /* ---------- MUSIC PLAYER ---------- */
+  #music-toggle{
+    position:fixed; right:18px; bottom:18px; z-index:200;
+    width:52px; height:52px; border-radius:50%;
+    background:var(--wine); color:var(--paper);
+    border:none; cursor:pointer;
+    font-size:20px;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 14px 28px -12px rgba(91,36,52,.6);
+    transition:transform .3s ease;
+  }
+  #music-toggle:hover{ transform:scale(1.08); }
+  #music-toggle .disc{
+    display:inline-block;
+    animation:spin 3.5s linear infinite;
+    animation-play-state:paused;
+  }
+  #music-toggle.playing .disc{ animation-play-state:running; }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  /* ---------- typewriter cursor ---------- */
+  .letter p .type-cursor{
+    display:inline-block;
+    width:2px; height:1em;
+    background:var(--rose-deep);
+    margin-left:2px;
+    vertical-align:-2px;
+    animation:blink .8s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+  .letter p.typing-line{ min-height:1.9em; }
+
+  /* ---------- LIGHTBOX ---------- */
+  .polaroid{ cursor:zoom-in; }
+  #lightbox{
+    position:fixed; inset:0; z-index:1500;
+    background:rgba(46,42,44,.92);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden;
+    transition:opacity .35s ease, visibility .35s ease;
+    padding:30px;
+  }
+  #lightbox.show{ opacity:1; visibility:visible; }
+  #lightbox img{
+    max-width:min(92vw, 720px);
+    max-height:85vh;
+    object-fit:contain;
+    border:6px solid #fff;
+    border-radius:4px;
+    box-shadow:0 30px 70px -20px rgba(0,0,0,.6);
+    transform:scale(.9);
+    transition:transform .35s ease;
+  }
+  #lightbox.show img{ transform:scale(1); }
+  #lightbox-close{
+    position:absolute; top:22px; right:26px;
+    width:44px; height:44px; border-radius:50%;
+    background:rgba(250,243,234,.15);
+    border:1px solid rgba(250,243,234,.4);
+    color:var(--paper);
+    font-size:22px; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+  }
+
+  /* ---------- EMOTIONAL ENDING ---------- */
+  .ending{
+    text-align:center;
+    padding:130px 24px 40px;
+    max-width:720px; margin:0 auto;
+  }
+  .ending .line{
+    font-family:'Playfair Display', serif;
+    font-style:italic; font-weight:600;
+    font-size:clamp(22px,4.2vw,36px);
+    color:var(--wine);
+    line-height:1.6;
+    opacity:0;
+    transform:translateY(16px);
+    transition:opacity 1.1s ease, transform 1.1s ease;
+  }
+  .ending .line.in{ opacity:1; transform:translateY(0); }
+  .ending .line:nth-child(2){ transition-delay:.5s; }
+  .ending .heart-pulse{
+    font-size:30px;
+    margin-top:22px;
+    opacity:0;
+    transition:opacity 1.1s ease 1.1s;
+    animation:heartPulse 1.6s ease-in-out infinite;
+  }
+  .ending .heart-pulse.in{ opacity:1; }
+  @keyframes heartPulse{ 0%,100%{ transform:scale(1); } 50%{ transform:scale(1.18); } }
+
+  footer{ padding-top:20px; }
+
+  /* ---------- click hearts ---------- */
+  .click-heart{
+    position:fixed; z-index:1600; pointer-events:none;
+    font-size:20px; color:var(--rose-deep);
+    transform:translate(-50%,-50%);
+    animation:heartFloat 1s ease-out forwards;
+  }
+  @keyframes heartFloat{
+    0%{ opacity:1; transform:translate(-50%,-50%) scale(.6) translateY(0); }
+    100%{ opacity:0; transform:translate(-50%,-50%) scale(1.3) translateY(-60px); }
+  }
+
+  /* ---------- trailing / scroll flowers ---------- */
+  .trail-flower{
+    position:fixed; z-index:6; pointer-events:none;
+    font-size:14px; color:var(--rose);
+    transform:translate(-50%,-50%);
+    animation:trailFade .9s ease-out forwards;
+  }
+  @keyframes trailFade{
+    0%{ opacity:.9; transform:translate(-50%,-50%) scale(.4) rotate(0deg); }
+    100%{ opacity:0; transform:translate(-50%,-50%) scale(1.1) rotate(90deg) translateY(-24px); }
+  }
 </style>
 </head>
 <body>
@@ -404,6 +522,14 @@
 <div id="away-msg">mau kemana? 👀</div>
 
 <div id="boom-text"><span>🎉 Selamat Ulang Tahun 🎉</span></div>
+
+<audio id="bgm" src="lagu.mp3" loop preload="auto"></audio>
+<button id="music-toggle" title="Putar/Jeda musik"><span class="disc">🎵</span></button>
+
+<div id="lightbox">
+  <button id="lightbox-close">✕</button>
+  <img id="lightbox-img" src="" alt="Foto diperbesar">
+</div>
 
 <div id="petals"></div>
 
@@ -420,12 +546,12 @@
 <section id="surat">
   <p class="section-title">Sepucuk Surat</p>
   <p class="section-sub">yang mungkin nggak sempat kesampaian</p>
-  <div class="letter reveal">
-    <p>Dear <span class="editme">[nama dia]</span>,</p>
-    <p>Di tanggal 5 Agustus ini, aku cuma mau bilang satu hal yang sederhana: selamat ulang tahun. Apapun yang pernah terjadi di antara kita, itu nggak mengubah fakta bahwa aku ikut senang kamu bertambah usia dengan sehat.</p>
-    <p>Aku masih ingat banyak hal — cara kamu ketawa, hal-hal kecil yang bikin harimu bagus, semua momen yang sempat kita lewati bareng. Semua itu nggak aku hapus, cuma aku simpan di tempat yang lebih tenang.</p>
-    <p>Semoga tahun ini jadi tahun yang baik buatmu. Semoga kamu tetap <em>semangat</em> menjalani apapun yang lagi kamu kejar sekarang, dan semoga hal-hal baik nemuin jalannya ke kamu.</p>
-    <p class="signoff">— dari seseorang yang pernah dekat</p>
+  <div class="letter reveal" id="letter">
+    <p class="typing-line" data-text="Dear [nama dia],"></p>
+    <p class="typing-line" data-text="Di tanggal 5 Agustus ini, aku cuma mau bilang satu hal yang sederhana: selamat ulang tahun. Apapun yang pernah terjadi di antara kita, itu nggak mengubah fakta bahwa aku ikut senang kamu bertambah usia dengan sehat."></p>
+    <p class="typing-line" data-text="Aku masih ingat banyak hal — cara kamu ketawa, hal-hal kecil yang bikin harimu bagus, semua momen yang sempat kita lewati bareng. Semua itu nggak aku hapus, cuma aku simpan di tempat yang lebih tenang."></p>
+    <p class="typing-line" data-text="Semoga tahun ini jadi tahun yang baik buatmu. Semoga kamu tetap semangat menjalani apapun yang lagi kamu kejar sekarang, dan semoga hal-hal baik nemuin jalannya ke kamu."></p>
+    <p class="signoff" id="letter-signoff" style="opacity:0">— dari seseorang yang pernah dekat</p>
   </div>
 </section>
 
@@ -433,18 +559,18 @@
 <section>
   <p class="section-title">Kenangan yang Tersimpan</p>
   <p class="section-sub">sepuluh potongan waktu</p>
-  <div class="gallery reveal">
+  <div class="gallery reveal" id="gallery">
     <!-- Ganti/letakkan file foto1.jpg s/d foto10.jpg di folder yang sama dengan file HTML ini -->
-    <div class="polaroid"><div class="frame"><img src="foto1.jpg" alt="Foto 1" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto1.jpg</div>'"></div><div class="cap">01</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto2.jpg" alt="Foto 2" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto2.jpg</div>'"></div><div class="cap">02</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto3.jpg" alt="Foto 3" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto3.jpg</div>'"></div><div class="cap">03</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto4.jpg" alt="Foto 4" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto4.jpg</div>'"></div><div class="cap">04</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto5.jpg" alt="Foto 5" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto5.jpg</div>'"></div><div class="cap">05</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto6.jpg" alt="Foto 6" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto6.jpg</div>'"></div><div class="cap">06</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto7.jpg" alt="Foto 7" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto7.jpg</div>'"></div><div class="cap">07</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto8.jpg" alt="Foto 8" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto8.jpg</div>'"></div><div class="cap">08</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto9.jpg" alt="Foto 9" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto9.jpg</div>'"></div><div class="cap">09</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto10.jpg" alt="Foto 10" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto10.jpg</div>'"></div><div class="cap">10</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto1.jpg" alt="Foto 1" data-full="foto1.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto1.jpg</div>'"></div><div class="cap">01</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto2.jpg" alt="Foto 2" data-full="foto2.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto2.jpg</div>'"></div><div class="cap">02</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto3.jpg" alt="Foto 3" data-full="foto3.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto3.jpg</div>'"></div><div class="cap">03</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto4.jpg" alt="Foto 4" data-full="foto4.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto4.jpg</div>'"></div><div class="cap">04</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto5.jpg" alt="Foto 5" data-full="foto5.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto5.jpg</div>'"></div><div class="cap">05</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto6.jpg" alt="Foto 6" data-full="foto6.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto6.jpg</div>'"></div><div class="cap">06</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto7.jpg" alt="Foto 7" data-full="foto7.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto7.jpg</div>'"></div><div class="cap">07</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto8.jpg" alt="Foto 8" data-full="foto8.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto8.jpg</div>'"></div><div class="cap">08</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto9.jpg" alt="Foto 9" data-full="foto9.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto9.jpg</div>'"></div><div class="cap">09</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto10.jpg" alt="Foto 10" data-full="foto10.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto10.jpg</div>'"></div><div class="cap">10</div></div>
   </div>
 </section>
 
@@ -459,6 +585,17 @@
     <div class="box"><span class="num" id="cd-m">--</span><span class="lbl">Menit</span></div>
     <div class="box"><span class="num" id="cd-s">--</span><span class="lbl">Detik</span></div>
   </div>
+  <div id="today-birthday" style="display:none; margin-top:46px;">
+    <p class="big" style="margin:0;">🎉 Hari ini ulang tahunnya!</p>
+    <p style="margin-top:14px;">Semoga harimu menyenangkan ❤️</p>
+  </div>
+</section>
+
+<!-- ENDING -->
+<section class="ending" id="ending">
+  <p class="line">Terima kasih sudah pernah hadir di hidupku.</p>
+  <p class="line">Semoga bahagia selalu, di mana pun kamu sekarang.</p>
+  <div class="heart-pulse">❤️</div>
 </section>
 
 <footer>
@@ -568,8 +705,166 @@
           document.documentElement.classList.remove('locked');
           document.body.classList.remove('locked');
         }, 1500);
+        // coba putar musik otomatis (diizinkan karena dipicu klik pengguna)
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('music-toggle');
+        if(bgm){
+          bgm.volume = 0.6;
+          bgm.play().then(()=> musicBtn.classList.add('playing')).catch(()=>{ /* browser tetap memblokir, biarkan tombol musik manual */ });
+        }
       }
     });
+  })();
+
+  // ---- toggle musik manual ----
+  (function(){
+    const bgm = document.getElementById('bgm');
+    const musicBtn = document.getElementById('music-toggle');
+    if(!bgm || !musicBtn) return;
+    musicBtn.addEventListener('click', ()=>{
+      if(bgm.paused){
+        bgm.play().then(()=> musicBtn.classList.add('playing')).catch(()=>{});
+      } else {
+        bgm.pause();
+        musicBtn.classList.remove('playing');
+      }
+    });
+    bgm.addEventListener('error', ()=>{
+      musicBtn.title = 'lagu.mp3 tidak ditemukan — letakkan file lagu.mp3 di folder yang sama';
+    });
+  })();
+
+  // ---- efek ketik untuk surat ----
+  (function(){
+    const letter = document.getElementById('letter');
+    if(!letter) return;
+    const lines = Array.from(letter.querySelectorAll('.typing-line'));
+    const signoff = document.getElementById('letter-signoff');
+    let started = false;
+
+    function typeLine(el, text, onDone){
+      let i = 0;
+      const cursor = document.createElement('span');
+      cursor.className = 'type-cursor';
+      el.appendChild(cursor);
+      const speed = 18;
+      const timer = setInterval(()=>{
+        if(i < text.length){
+          cursor.insertAdjacentText('beforebegin', text[i]);
+          i++;
+        } else {
+          clearInterval(timer);
+          cursor.remove();
+          if(onDone) onDone();
+        }
+      }, speed);
+    }
+
+    function typeAll(idx){
+      if(idx >= lines.length){
+        signoff.style.transition = 'opacity 1s ease';
+        signoff.style.opacity = '1';
+        return;
+      }
+      typeLine(lines[idx], lines[idx].dataset.text, ()=> typeAll(idx+1));
+    }
+
+    const letterIo = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting && !started){
+          started = true;
+          typeAll(0);
+        }
+      });
+    }, {threshold:.3});
+    letterIo.observe(letter);
+  })();
+
+  // ---- lightbox foto fullscreen ----
+  (function(){
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const closeBtn = document.getElementById('lightbox-close');
+    const gallery = document.getElementById('gallery');
+    if(!gallery) return;
+    gallery.addEventListener('click', (e)=>{
+      const img = e.target.closest('img[data-full]');
+      if(!img) return;
+      lightboxImg.src = img.dataset.full;
+      lightbox.classList.add('show');
+    });
+    function closeLightbox(){ lightbox.classList.remove('show'); }
+    closeBtn.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e)=>{ if(e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeLightbox(); });
+  })();
+
+  // ---- ending emosional muncul saat di-scroll ----
+  (function(){
+    const ending = document.getElementById('ending');
+    if(!ending) return;
+    const endIo = new IntersectionObserver((entries)=>{
+      entries.forEach(e=>{
+        if(e.isIntersecting){
+          ending.querySelectorAll('.line, .heart-pulse').forEach(el=> el.classList.add('in'));
+        }
+      });
+    }, {threshold:.4});
+    endIo.observe(ending);
+  })();
+
+  // ---- efek hati saat klik di mana saja ----
+  (function(){
+    document.addEventListener('click', (e)=>{
+      const h = document.createElement('div');
+      h.className = 'click-heart';
+      h.textContent = '❤️';
+      h.style.left = e.clientX + 'px';
+      h.style.top = e.clientY + 'px';
+      document.body.appendChild(h);
+      setTimeout(()=> h.remove(), 1000);
+    });
+  })();
+
+  // ---- bunga kecil mengikuti cursor ----
+  (function(){
+    const flowerSymbols = ['❀','✿','❁','✾'];
+    let lastMove = 0;
+    document.addEventListener('mousemove', (e)=>{
+      const now = Date.now();
+      if(now - lastMove < 90) return;
+      lastMove = now;
+      if(Math.random() > 0.55) return; // biar nggak terlalu padat
+      const f = document.createElement('div');
+      f.className = 'trail-flower';
+      f.textContent = flowerSymbols[Math.floor(Math.random()*flowerSymbols.length)];
+      f.style.left = e.clientX + 'px';
+      f.style.top = e.clientY + 'px';
+      document.body.appendChild(f);
+      setTimeout(()=> f.remove(), 900);
+    });
+  })();
+
+  // ---- bunga muncul mengikuti scroll ----
+  (function(){
+    const flowerSymbols = ['❀','✿','❁','✾'];
+    let lastY = window.scrollY;
+    let lastSpawn = 0;
+    window.addEventListener('scroll', ()=>{
+      const now = Date.now();
+      const dy = window.scrollY - lastY;
+      lastY = window.scrollY;
+      if(Math.abs(dy) < 4) return;
+      if(now - lastSpawn < 120) return;
+      lastSpawn = now;
+      const f = document.createElement('div');
+      f.className = 'trail-flower';
+      f.textContent = flowerSymbols[Math.floor(Math.random()*flowerSymbols.length)];
+      f.style.left = (Math.random()*100) + 'vw';
+      f.style.top = (dy > 0 ? 20 : window.innerHeight-20) + 'px';
+      document.body.appendChild(f);
+      setTimeout(()=> f.remove(), 900);
+    }, {passive:true});
   })();
 
   // petal animation
@@ -592,17 +887,29 @@
   }, {threshold:.15});
   document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-  // countdown to next Aug 5
+  // countdown ke 5 Agustus berikutnya, atau pesan spesial kalau hari ini pas tanggalnya
+  function isBirthdayToday(d){
+    return d.getMonth() === 7 && d.getDate() === 5; // Agustus = index 7
+  }
   function nextAug5(){
     const now = new Date();
     let year = now.getFullYear();
-    let target = new Date(year, 7, 5, 0,0,0); // month 7 = Agustus (0-indexed)
+    let target = new Date(year, 7, 5, 0,0,0);
     if(target < now) target = new Date(year+1, 7, 5, 0,0,0);
     return target;
   }
   function tickCountdown(){
-    const target = nextAug5();
     const now = new Date();
+    const countdownEl = document.getElementById('countdown');
+    const todayEl = document.getElementById('today-birthday');
+    if(isBirthdayToday(now)){
+      countdownEl.style.display = 'none';
+      todayEl.style.display = 'block';
+      return;
+    }
+    countdownEl.style.display = 'flex';
+    todayEl.style.display = 'none';
+    const target = nextAug5();
     let diff = Math.max(0, target - now);
     const d = Math.floor(diff/86400000); diff-=d*86400000;
     const h = Math.floor(diff/3600000); diff-=h*3600000;
