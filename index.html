@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dear, Selamat Ulang Tahun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#FAF3EA;
+    --paper-2:#F2E8DA;
+    --wine:#5B2434;
+    --rose:#D98FA0;
+    --rose-deep:#B96477;
+    --gold:#C9A66B;
+    --ink:#2E2A2C;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'EB Garamond', serif;
+    overflow-x:hidden;
+  }
+
+  /* ---------- floating petals ---------- */
+  .petal{
+    position:fixed; top:-40px; z-index:5; pointer-events:none;
+    font-size:20px; color:var(--rose); opacity:.7;
+    animation:fall linear infinite;
+  }
+  @keyframes fall{
+    to{ transform:translateY(110vh) rotate(360deg); opacity:0; }
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100svh;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center;
+    padding:40px 24px;
+    position:relative;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(217,143,160,.25), transparent 45%),
+      radial-gradient(circle at 85% 80%, rgba(201,166,107,.2), transparent 40%),
+      var(--paper);
+  }
+  .eyebrow{
+    font-family:'Caveat', cursive;
+    font-size:clamp(22px,4vw,32px);
+    color:var(--rose-deep);
+    letter-spacing:.5px;
+    margin-bottom:6px;
+    opacity:0;
+    animation:riseIn .9s ease forwards .2s;
+  }
+  .hero h1{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-style:italic;
+    font-size:clamp(42px, 9vw, 96px);
+    color:var(--wine);
+    line-height:1.05;
+    opacity:0;
+    animation:riseIn 1s ease forwards .5s;
+  }
+  .hero .date{
+    margin-top:22px;
+    font-size:clamp(15px,2.4vw,19px);
+    letter-spacing:3px;
+    text-transform:uppercase;
+    color:var(--ink);
+    opacity:0;
+    animation:riseIn .9s ease forwards .9s;
+  }
+  .hero .date span{ color:var(--rose-deep); font-weight:600; }
+  .hero .cta{
+    margin-top:44px;
+    opacity:0;
+    animation:riseIn .9s ease forwards 1.3s;
+  }
+  .hero .cta a{
+    display:inline-block;
+    padding:14px 34px;
+    border:1.5px solid var(--wine);
+    border-radius:999px;
+    color:var(--wine);
+    text-decoration:none;
+    font-size:16px;
+    letter-spacing:1px;
+    transition:.35s;
+  }
+  .hero .cta a:hover{ background:var(--wine); color:var(--paper); }
+
+  @keyframes riseIn{
+    from{ opacity:0; transform:translateY(18px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+
+  .scroll-cue{
+    position:absolute; bottom:28px; left:50%; transform:translateX(-50%);
+    font-size:13px; letter-spacing:2px; color:var(--rose-deep); opacity:.8;
+    animation:bob 2s ease-in-out infinite;
+  }
+  @keyframes bob{ 0%,100%{transform:translate(-50%,0);} 50%{transform:translate(-50%,8px);} }
+
+  /* ---------- SECTION shared ---------- */
+  section{ padding:110px 20px; max-width:980px; margin:0 auto; }
+  .section-title{
+    font-family:'Playfair Display', serif;
+    font-style:italic; font-weight:600;
+    font-size:clamp(30px,5vw,48px);
+    color:var(--wine);
+    text-align:center;
+    margin-bottom:14px;
+  }
+  .section-sub{
+    text-align:center;
+    color:var(--rose-deep);
+    font-family:'Caveat', cursive;
+    font-size:22px;
+    margin-bottom:56px;
+  }
+  .reveal{
+    opacity:0; transform:translateY(30px);
+    transition:opacity .8s ease, transform .8s ease;
+  }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ---------- LETTER ---------- */
+  .letter{
+    background:var(--paper-2);
+    border:1px solid rgba(91,36,52,.15);
+    border-radius:6px;
+    padding:clamp(28px,6vw,64px);
+    box-shadow:0 20px 45px -25px rgba(91,36,52,.4);
+    position:relative;
+  }
+  .letter::before{
+    content:"";
+    position:absolute; inset:10px;
+    border:1px solid rgba(201,166,107,.5);
+    border-radius:4px;
+    pointer-events:none;
+  }
+  .letter p{
+    font-size:clamp(17px,2.3vw,20px);
+    line-height:1.9;
+    color:var(--ink);
+    margin-bottom:20px;
+  }
+  .letter .signoff{
+    font-family:'Caveat', cursive;
+    font-size:32px;
+    color:var(--rose-deep);
+    text-align:right;
+    margin-top:30px;
+  }
+  .letter .editme{ background:rgba(217,143,160,.25); padding:0 4px; border-radius:3px; }
+
+  /* ---------- GALLERY (polaroid wall) ---------- */
+  .gallery{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(190px,1fr));
+    gap:34px 26px;
+    padding-top:10px;
+  }
+  .polaroid{
+    background:#fff;
+    padding:14px 14px 46px 14px;
+    border-radius:3px;
+    box-shadow:0 14px 30px -14px rgba(46,42,44,.35);
+    transform:rotate(var(--r,-3deg));
+    transition:transform .35s ease, box-shadow .35s ease;
+    position:relative;
+  }
+  .polaroid:nth-child(2n){ --r:2.5deg; }
+  .polaroid:nth-child(3n){ --r:-4deg; }
+  .polaroid:nth-child(4n){ --r:3deg; }
+  .polaroid:nth-child(5n){ --r:-2deg; }
+  .polaroid:hover{
+    transform:rotate(0deg) scale(1.06) translateY(-6px);
+    box-shadow:0 26px 45px -18px rgba(46,42,44,.5);
+    z-index:3;
+  }
+  .polaroid .frame{
+    width:100%; aspect-ratio:1/1;
+    background:var(--paper-2);
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .polaroid img{
+    width:100%; height:100%; object-fit:cover; display:block;
+  }
+  .polaroid .frame .fallback{
+    font-family:'Caveat', cursive;
+    color:var(--rose-deep);
+    font-size:15px; text-align:center; padding:8px;
+  }
+  .polaroid .cap{
+    position:absolute; bottom:10px; left:0; right:0;
+    text-align:center;
+    font-family:'Caveat', cursive;
+    font-size:18px;
+    color:var(--ink);
+  }
+
+  /* ---------- SEMANGAT / motivation ---------- */
+  .semangat{
+    text-align:center;
+  }
+  .semangat .big{
+    font-family:'Playfair Display', serif;
+    font-style:italic; font-weight:700;
+    font-size:clamp(30px,6vw,54px);
+    color:var(--rose-deep);
+    line-height:1.3;
+  }
+  .semangat p{
+    max-width:620px; margin:26px auto 0;
+    font-size:clamp(16px,2.2vw,19px);
+    line-height:1.85;
+  }
+
+  /* ---------- countdown ---------- */
+  .countdown{
+    display:flex; gap:18px; justify-content:center; flex-wrap:wrap;
+    margin-top:46px;
+  }
+  .countdown .box{
+    background:var(--paper-2);
+    border:1px solid rgba(91,36,52,.15);
+    border-radius:10px;
+    padding:18px 22px;
+    min-width:88px;
+    text-align:center;
+  }
+  .countdown .num{
+    font-family:'Playfair Display', serif;
+    font-weight:700;
+    font-size:32px;
+    color:var(--wine);
+    display:block;
+  }
+  .countdown .lbl{
+    font-size:12px;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    color:var(--rose-deep);
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    text-align:center;
+    padding:60px 20px 90px;
+    font-family:'Caveat', cursive;
+    font-size:24px;
+    color:var(--rose-deep);
+  }
+  footer .small{
+    font-family:'EB Garamond', serif;
+    font-size:13px;
+    letter-spacing:1px;
+    color:var(--ink);
+    opacity:.55;
+    margin-top:10px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div id="petals"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="eyebrow">untuk kamu, yang pernah jadi rumah</div>
+  <h1>Dear,<br>Selamat Ulang&nbsp;Tahun</h1>
+  <div class="date">5 <span>Agustus</span></div>
+  <div class="cta"><a href="#surat">buka suratnya →</a></div>
+  <div class="scroll-cue">gulir ke bawah</div>
+</section>
+
+<!-- SURAT -->
+<section id="surat">
+  <p class="section-title">Sepucuk Surat</p>
+  <p class="section-sub">yang mungkin nggak sempat kesampaian</p>
+  <div class="letter reveal">
+    <p>Dear <span class="editme">[nama dia]</span>,</p>
+    <p>Di tanggal 5 Agustus ini, aku cuma mau bilang satu hal yang sederhana: selamat ulang tahun. Apapun yang pernah terjadi di antara kita, itu nggak mengubah fakta bahwa aku ikut senang kamu bertambah usia dengan sehat.</p>
+    <p>Aku masih ingat banyak hal — cara kamu ketawa, hal-hal kecil yang bikin harimu bagus, semua momen yang sempat kita lewati bareng. Semua itu nggak aku hapus, cuma aku simpan di tempat yang lebih tenang.</p>
+    <p>Semoga tahun ini jadi tahun yang baik buatmu. Semoga kamu tetap <em>semangat</em> menjalani apapun yang lagi kamu kejar sekarang, dan semoga hal-hal baik nemuin jalannya ke kamu.</p>
+    <p class="signoff">— dari seseorang yang pernah dekat</p>
+  </div>
+</section>
+
+<!-- GALERI FOTO -->
+<section>
+  <p class="section-title">Kenangan yang Tersimpan</p>
+  <p class="section-sub">sepuluh potongan waktu</p>
+  <div class="gallery reveal">
+    <!-- Ganti/letakkan file foto1.jpg s/d foto10.jpg di folder yang sama dengan file HTML ini -->
+    <div class="polaroid"><div class="frame"><img src="foto1.jpg" alt="Foto 1" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto1.jpg</div>'"></div><div class="cap">01</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto2.jpg" alt="Foto 2" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto2.jpg</div>'"></div><div class="cap">02</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto3.jpg" alt="Foto 3" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto3.jpg</div>'"></div><div class="cap">03</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto4.jpg" alt="Foto 4" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto4.jpg</div>'"></div><div class="cap">04</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto5.jpg" alt="Foto 5" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto5.jpg</div>'"></div><div class="cap">05</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto6.jpg" alt="Foto 6" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto6.jpg</div>'"></div><div class="cap">06</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto7.jpg" alt="Foto 7" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto7.jpg</div>'"></div><div class="cap">07</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto8.jpg" alt="Foto 8" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto8.jpg</div>'"></div><div class="cap">08</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto9.jpg" alt="Foto 9" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto9.jpg</div>'"></div><div class="cap">09</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto10.jpg" alt="Foto 10" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto10.jpg</div>'"></div><div class="cap">10</div></div>
+  </div>
+</section>
+
+<!-- SEMANGAT -->
+<section class="semangat">
+  <p class="big reveal">Tetap Semangat, ya.</p>
+  <p class="reveal">Apapun yang lagi kamu perjuangkan sekarang — kuliah, kerjaan, mimpi-mimpi kecil yang kamu simpan sendiri — jangan berhenti. Kamu orang yang kuat, lebih kuat dari yang kamu sadari. Selamat ulang tahun, dan semoga tahun ini penuh hal-hal yang bikin kamu bangga sama diri sendiri.</p>
+
+  <div class="countdown reveal" id="countdown">
+    <div class="box"><span class="num" id="cd-d">--</span><span class="lbl">Hari</span></div>
+    <div class="box"><span class="num" id="cd-h">--</span><span class="lbl">Jam</span></div>
+    <div class="box"><span class="num" id="cd-m">--</span><span class="lbl">Menit</span></div>
+    <div class="box"><span class="num" id="cd-s">--</span><span class="lbl">Detik</span></div>
+  </div>
+</section>
+
+<footer>
+  Selamat ulang tahun, 5 Agustus 🤍
+  <div class="small">dibuat dengan hati-hati, bukan buat mengganggu — cuma buat ngucapin</div>
+</footer>
+
+<script>
+  // petal animation
+  const petalHost = document.getElementById('petals');
+  const symbols = ['❀','✿','❁','♡'];
+  for(let i=0;i<18;i++){
+    const p = document.createElement('div');
+    p.className='petal';
+    p.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+    p.style.left = Math.random()*100+'vw';
+    p.style.fontSize = (14+Math.random()*14)+'px';
+    p.style.animationDuration = (9+Math.random()*10)+'s';
+    p.style.animationDelay = (Math.random()*10)+'s';
+    petalHost.appendChild(p);
+  }
+
+  // scroll reveal
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in'); });
+  }, {threshold:.15});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+  // countdown to next Aug 5
+  function nextAug5(){
+    const now = new Date();
+    let year = now.getFullYear();
+    let target = new Date(year, 7, 5, 0,0,0); // month 7 = Agustus (0-indexed)
+    if(target < now) target = new Date(year+1, 7, 5, 0,0,0);
+    return target;
+  }
+  function tickCountdown(){
+    const target = nextAug5();
+    const now = new Date();
+    let diff = Math.max(0, target - now);
+    const d = Math.floor(diff/86400000); diff-=d*86400000;
+    const h = Math.floor(diff/3600000); diff-=h*3600000;
+    const m = Math.floor(diff/60000); diff-=m*60000;
+    const s = Math.floor(diff/1000);
+    document.getElementById('cd-d').textContent = d;
+    document.getElementById('cd-h').textContent = String(h).padStart(2,'0');
+    document.getElementById('cd-m').textContent = String(m).padStart(2,'0');
+    document.getElementById('cd-s').textContent = String(s).padStart(2,'0');
+  }
+  tickCountdown();
+  setInterval(tickCountdown, 1000);
+</script>
+
+</body>
+</html>
