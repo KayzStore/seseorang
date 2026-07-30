@@ -1097,10 +1097,22 @@
       typeLine(lines[idx], lines[idx].dataset.text, ()=> typeAll(idx+1));
     }
 
+    // reserve tinggi akhir tiap paragraf dulu (biar konten di bawah surat
+    // nggak ikut kedorong turun selama teks lagi diketik satu-satu)
+    function reserveHeights(){
+      lines.forEach(el=>{
+        el.textContent = el.dataset.text;
+        const h = el.getBoundingClientRect().height;
+        el.style.minHeight = h + 'px';
+        el.textContent = '';
+      });
+    }
+
     const letterIo = new IntersectionObserver((entries)=>{
       entries.forEach(e=>{
         if(e.isIntersecting && !started){
           started = true;
+          reserveHeights();
           typeAll(0);
         }
       });
@@ -1191,20 +1203,26 @@
     const flowerSymbols = ['❀','✿','❁','✾'];
     let lastY = window.scrollY;
     let lastSpawn = 0;
+    let ticking = false;
     window.addEventListener('scroll', ()=>{
-      const now = Date.now();
-      const dy = window.scrollY - lastY;
-      lastY = window.scrollY;
-      if(Math.abs(dy) < 4) return;
-      if(now - lastSpawn < 120) return;
-      lastSpawn = now;
-      const f = document.createElement('div');
-      f.className = 'trail-flower';
-      f.textContent = flowerSymbols[Math.floor(Math.random()*flowerSymbols.length)];
-      f.style.left = (Math.random()*100) + 'vw';
-      f.style.top = (dy > 0 ? 20 : window.innerHeight-20) + 'px';
-      document.body.appendChild(f);
-      setTimeout(()=> f.remove(), 900);
+      if(ticking) return;
+      ticking = true;
+      requestAnimationFrame(()=>{
+        ticking = false;
+        const now = Date.now();
+        const dy = window.scrollY - lastY;
+        lastY = window.scrollY;
+        if(Math.abs(dy) < 4) return;
+        if(now - lastSpawn < 220) return;
+        lastSpawn = now;
+        const f = document.createElement('div');
+        f.className = 'trail-flower';
+        f.textContent = flowerSymbols[Math.floor(Math.random()*flowerSymbols.length)];
+        f.style.left = (Math.random()*100) + 'vw';
+        f.style.top = (dy > 0 ? 20 : window.innerHeight-20) + 'px';
+        document.body.appendChild(f);
+        setTimeout(()=> f.remove(), 900);
+      });
     }, {passive:true});
   })();
 
