@@ -76,6 +76,14 @@
     animation:riseIn .9s ease forwards .9s;
   }
   .hero .date span{ color:var(--rose-deep); font-weight:600; }
+  .hero-note{
+    margin-top:18px;
+    font-family:'Caveat', cursive;
+    font-size:clamp(18px,3vw,23px);
+    color:var(--ink);
+    opacity:0;
+    animation:riseIn .9s ease forwards 1.1s;
+  }
   .hero .cta{
     margin-top:44px;
     opacity:0;
@@ -508,6 +516,43 @@
   @keyframes trailFade{
     0%{ opacity:.9; transform:translate(-50%,-50%) scale(.4) rotate(0deg); }
     100%{ opacity:0; transform:translate(-50%,-50%) scale(1.1) rotate(90deg) translateY(-24px); }
+  }  /* ---------- toast musik ---------- */
+  #music-toast{
+    position:fixed; right:18px; bottom:80px; z-index:200;
+    background:var(--paper-2);
+    border:1px solid rgba(91,36,52,.2);
+    color:var(--ink);
+    font-family:'EB Garamond', serif;
+    font-size:14px;
+    padding:12px 18px;
+    border-radius:10px;
+    box-shadow:0 14px 28px -14px rgba(91,36,52,.5);
+    max-width:230px;
+    opacity:0; transform:translateY(10px);
+    pointer-events:none;
+    transition:opacity .4s ease, transform .4s ease;
+  }
+  #music-toast.show{ opacity:1; transform:translateY(0); }
+
+  /* ---------- fade-in foto saat dimuat ---------- */
+  .polaroid img{
+    opacity:0;
+    transition:opacity .6s ease;
+  }
+  .polaroid img.loaded{ opacity:1; }
+  .polaroid .frame{ position:relative; }
+  .polaroid .frame::before{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(120deg, var(--paper-2) 25%, #fff 50%, var(--paper-2) 75%);
+    background-size:200% 100%;
+    animation:shimmer 1.4s linear infinite;
+  }
+  .polaroid .frame:has(img.loaded)::before{ display:none; }
+  .polaroid .frame.no-shimmer::before{ display:none; }
+  @keyframes shimmer{
+    0%{ background-position:200% 0; }
+    100%{ background-position:-200% 0; }
   }
 </style>
 </head>
@@ -525,6 +570,7 @@
 
 <audio id="bgm" src="lagu.mp3" loop preload="auto"></audio>
 <button id="music-toggle" title="Putar/Jeda musik"><span class="disc">🎵</span></button>
+<div id="music-toast">🎵 Klik tombol musik kalau lagunya belum mulai.</div>
 
 <div id="lightbox">
   <button id="lightbox-close">✕</button>
@@ -538,6 +584,7 @@
   <div class="eyebrow">untuk kamu, yang pernah jadi rumah</div>
   <h1>Dear,<br>Selamat Ulang&nbsp;Tahun</h1>
   <div class="date">5 <span>Agustus</span></div>
+  <p class="hero-note">Ada satu ucapan yang rasanya nggak boleh kelewat.</p>
   <div class="cta"><a href="#surat">buka suratnya →</a></div>
   <div class="scroll-cue">gulir ke bawah</div>
 </section>
@@ -561,16 +608,16 @@
   <p class="section-sub">sepuluh potongan waktu</p>
   <div class="gallery reveal" id="gallery">
     <!-- Ganti/letakkan file foto1.jpg s/d foto10.jpg di folder yang sama dengan file HTML ini -->
-    <div class="polaroid"><div class="frame"><img src="foto1.jpg" alt="Foto 1" data-full="foto1.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto1.jpg</div>'"></div><div class="cap">01</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto2.jpg" alt="Foto 2" data-full="foto2.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto2.jpg</div>'"></div><div class="cap">02</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto3.jpg" alt="Foto 3" data-full="foto3.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto3.jpg</div>'"></div><div class="cap">03</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto4.jpg" alt="Foto 4" data-full="foto4.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto4.jpg</div>'"></div><div class="cap">04</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto5.jpg" alt="Foto 5" data-full="foto5.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto5.jpg</div>'"></div><div class="cap">05</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto6.jpg" alt="Foto 6" data-full="foto6.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto6.jpg</div>'"></div><div class="cap">06</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto7.jpg" alt="Foto 7" data-full="foto7.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto7.jpg</div>'"></div><div class="cap">07</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto8.jpg" alt="Foto 8" data-full="foto8.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto8.jpg</div>'"></div><div class="cap">08</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto9.jpg" alt="Foto 9" data-full="foto9.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto9.jpg</div>'"></div><div class="cap">09</div></div>
-    <div class="polaroid"><div class="frame"><img src="foto10.jpg" alt="Foto 10" data-full="foto10.jpg" onerror="this.parentElement.innerHTML='<div class=\'fallback\'>foto10.jpg</div>'"></div><div class="cap">10</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto1.jpg" alt="Foto 1" data-full="foto1.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto1.jpg</div>'"></div><div class="cap">01</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto2.jpg" alt="Foto 2" data-full="foto2.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto2.jpg</div>'"></div><div class="cap">02</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto3.jpg" alt="Foto 3" data-full="foto3.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto3.jpg</div>'"></div><div class="cap">03</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto4.jpg" alt="Foto 4" data-full="foto4.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto4.jpg</div>'"></div><div class="cap">04</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto5.jpg" alt="Foto 5" data-full="foto5.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto5.jpg</div>'"></div><div class="cap">05</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto6.jpg" alt="Foto 6" data-full="foto6.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto6.jpg</div>'"></div><div class="cap">06</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto7.jpg" alt="Foto 7" data-full="foto7.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto7.jpg</div>'"></div><div class="cap">07</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto8.jpg" alt="Foto 8" data-full="foto8.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto8.jpg</div>'"></div><div class="cap">08</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto9.jpg" alt="Foto 9" data-full="foto9.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto9.jpg</div>'"></div><div class="cap">09</div></div>
+    <div class="polaroid"><div class="frame"><img src="foto10.jpg" alt="Foto 10" data-full="foto10.jpg" onerror="this.parentElement.classList.add('no-shimmer'); this.parentElement.innerHTML='<div class=\'fallback\'>foto10.jpg</div>'"></div><div class="cap">10</div></div>
   </div>
 </section>
 
@@ -599,8 +646,8 @@
 </section>
 
 <footer>
-  Selamat ulang tahun, 5 Agustus 🤍
-  <div class="small">dibuat dengan hati-hati, bukan buat mengganggu — cuma buat ngucapin</div>
+  Terima kasih sudah membaca sampai akhir.
+  <div class="small">— selesai —</div>
 </footer>
 
 <script>
@@ -708,9 +755,15 @@
         // coba putar musik otomatis (diizinkan karena dipicu klik pengguna)
         const bgm = document.getElementById('bgm');
         const musicBtn = document.getElementById('music-toggle');
+        const musicToast = document.getElementById('music-toast');
+        function showMusicToast(){
+          if(!musicToast) return;
+          musicToast.classList.add('show');
+          setTimeout(()=> musicToast.classList.remove('show'), 5000);
+        }
         if(bgm){
           bgm.volume = 0.6;
-          bgm.play().then(()=> musicBtn.classList.add('playing')).catch(()=>{ /* browser tetap memblokir, biarkan tombol musik manual */ });
+          bgm.play().then(()=> musicBtn.classList.add('playing')).catch(showMusicToast);
         }
       }
     });
@@ -731,6 +784,12 @@
     });
     bgm.addEventListener('error', ()=>{
       musicBtn.title = 'lagu.mp3 tidak ditemukan — letakkan file lagu.mp3 di folder yang sama';
+      const toast = document.getElementById('music-toast');
+      if(toast){
+        toast.textContent = '🎵 lagu.mp3 belum ditemukan di folder ini.';
+        toast.classList.add('show');
+        setTimeout(()=> toast.classList.remove('show'), 5000);
+      }
     });
   })();
 
@@ -778,6 +837,19 @@
       });
     }, {threshold:.3});
     letterIo.observe(letter);
+  })();
+
+  // ---- fade-in foto galeri saat selesai dimuat ----
+  (function(){
+    document.querySelectorAll('.polaroid img').forEach(img=>{
+      function markLoaded(){ img.classList.add('loaded'); }
+      if(img.complete && img.naturalWidth > 0){
+        markLoaded();
+      } else {
+        img.addEventListener('load', markLoaded);
+        img.addEventListener('error', markLoaded); // biar shimmer nggak nyala terus kalau foto belum ada
+      }
+    });
   })();
 
   // ---- lightbox foto fullscreen ----
